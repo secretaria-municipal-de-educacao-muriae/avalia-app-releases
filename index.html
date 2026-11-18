@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Instalar o Avalia</title>
+  <meta name="description" content="Baixe e instale a versão mais recente do app Avalia no Android.">
+  <meta name="theme-color" content="#F8F9FA" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0B1E2D" media="(prefers-color-scheme: dark)">
+  <link rel="icon" type="image/png" href="logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* Mesmas cores do app (src/themes/colors.ts), claro e escuro. */
+    :root {
+      --primaria: #2BABE1;
+      --botao: #04588B;
+      --botao-texto: #FFFFFF;
+      --fundo: #F8F9FA;
+      --superficie: #FFFFFF;
+      --texto: #1A1A1A;
+      --texto-2: #6C757D;
+      --borda: #DEE2E6;
+      --suave: rgba(43, 171, 225, 0.12);
+      --perigo: #E74C3C;
+      --sombra: 0 8px 24px rgba(4, 88, 139, 0.08);
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --primaria: #4FC3F7;
+        --botao: #4FC3F7;
+        --botao-texto: #04283D;
+        --fundo: #0B1E2D;
+        --superficie: #12293B;
+        --texto: #F1F5F9;
+        --texto-2: #CBD5E1;
+        --borda: #1E3A52;
+        --suave: rgba(79, 195, 247, 0.14);
+        --perigo: #FB7185;
+        --sombra: none;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Montserrat", system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--texto);
+      background: var(--fundo);
+    }
+    main {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 32px 16px 48px;
+    }
+
+    .marca { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+    .marca img { width: 48px; height: 48px; }
+    .marca strong { display: block; font-size: 24px; font-weight: 700; line-height: 1.2; }
+    .marca span { font-size: 13px; color: var(--texto-2); }
+
+    .cartao {
+      background: var(--superficie);
+      border: 1px solid var(--borda);
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: var(--sombra);
+    }
+    .cartao + .cartao { margin-top: 16px; }
+
+    h1 { font-size: 22px; font-weight: 700; line-height: 1.3; margin: 0 0 8px; }
+    h2 { font-size: 17px; font-weight: 700; margin: 0 0 16px; }
+    p { margin: 0; }
+    .secundario { color: var(--texto-2); }
+
+    .versao {
+      display: inline-block;
+      margin: 16px 0 20px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--texto);
+      background: var(--suave);
+    }
+
+    .botao {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      width: 100%;
+      min-height: 56px;
+      padding: 14px 20px;
+      border-radius: 12px;
+      font: 700 17px/1.2 "Montserrat", system-ui, sans-serif;
+      text-decoration: none;
+      color: var(--botao-texto);
+      background: var(--botao);
+      transition: transform 0.1s, opacity 0.2s;
+    }
+    .botao:active { transform: scale(0.98); }
+    .botao[aria-disabled="true"] { opacity: 0.55; pointer-events: none; }
+    .botao svg { width: 22px; height: 22px; flex: none; }
+
+    .link-todas {
+      display: block;
+      margin-top: 14px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--primaria);
+    }
+
+    .aviso {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      font-size: 14px;
+      border: 1px solid var(--borda);
+      background: var(--fundo);
+    }
+    .aviso.erro { border-color: var(--perigo); }
+
+    /* Só no computador: o QR leva esta mesma página pro celular. */
+    .qr { display: none; align-items: center; gap: 20px; }
+    [data-plataforma="computador"] .qr { display: flex; }
+    .qr-codigo {
+      flex: none;
+      width: 132px;
+      height: 132px;
+      padding: 10px;
+      border-radius: 12px;
+      background: #FFFFFF; /* QR precisa de fundo claro em qualquer tema pra ser lido. */
+    }
+    .qr-codigo svg { width: 100%; height: 100%; display: block; }
+
+    .iphone { display: none; }
+    [data-plataforma="ios"] .iphone { display: block; }
+
+    .passos { list-style: none; margin: 0; padding: 0; counter-reset: passo; }
+    .passos li {
+      counter-increment: passo;
+      position: relative;
+      padding-left: 48px;
+      min-height: 32px;
+    }
+    .passos li + li { margin-top: 18px; }
+    .passos li::before {
+      content: counter(passo);
+      position: absolute;
+      left: 0;
+      top: -2px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--primaria);
+      background: var(--suave);
+    }
+    .passos b { font-weight: 700; }
+    .passos .secundario { display: block; font-size: 14px; margin-top: 2px; }
+
+    /* Link ou palavra longa nas notas quebra a linha em vez de alargar a página. */
+    .notas { font-size: 15px; overflow-wrap: anywhere; }
+    .notas ul { margin: 0; padding-left: 20px; }
+    .notas li + li, .notas p + p { margin-top: 6px; }
+    .notas strong { display: block; margin-top: 10px; }
+
+    details { font-size: 15px; }
+    details + details { margin-top: 12px; }
+    summary { cursor: pointer; font-weight: 600; }
+    details p { margin-top: 8px; color: var(--texto-2); }
+
+    footer { margin-top: 32px; text-align: center; font-size: 13px; color: var(--texto-2); }
+
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <header class="marca">
+      <img src="logo.png" alt="">
+      <div>
+        <strong>Avalia</strong>
+        <span>Secretaria Municipal de Educação de Muriaé</span>
+      </div>
+    </header>
+
+    <section class="cartao">
+      <h1>Instale o app no seu celular</h1>
+      <p class="secundario">Versão de testes para Android. Depois de instalado, o próprio app avisa quando sair versão nova.</p>
+
+      <span class="versao" id="versao">Procurando a versão mais recente…</span>
+
+      <a class="botao" id="botao" href="#" aria-disabled="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>
+        </svg>
+        <span id="botao-texto">Baixar o app</span>
+      </a>
+      <a class="link-todas" id="link-todas" href="#">Ver todas as versões</a>
+
+      <p class="aviso iphone">No iPhone não dá para instalar por aqui: este arquivo é só para Android.</p>
+      <p class="aviso erro" id="erro" hidden></p>
+    </section>
+
+    <section class="cartao qr">
+      <div class="qr-codigo" id="qr" role="img" aria-label="QR code desta página"></div>
+      <div>
+        <h2>Está no computador?</h2>
+        <p class="secundario">Aponte a câmera do celular para o código. Esta página abre lá e o download sai direto no aparelho.</p>
+      </div>
+    </section>
+
+    <section class="cartao">
+      <h2>Como instalar</h2>
+      <ol class="passos">
+        <li>
+          <b>Toque em “Baixar o app”.</b>
+          <span class="secundario">O Chrome pode avisar que o arquivo pode ser perigoso. É o aviso padrão para qualquer app fora da loja: toque em <b>Baixar mesmo assim</b>.</span>
+        </li>
+        <li>
+          <b>Quando terminar, toque em “Abrir”.</b>
+          <span class="secundario">Aparece na barra do download ou na notificação. Também dá para abrir pelo app <b>Arquivos</b>, na pasta Downloads.</span>
+        </li>
+        <li>
+          <b>Libere a instalação, só na primeira vez.</b>
+          <span class="secundario">O Android avisa que não pode instalar apps desta fonte. Toque em <b>Configurações</b>, ative <b>Permitir desta fonte</b> e volte.</span>
+        </li>
+        <li>
+          <b>Toque em “Instalar”.</b>
+          <span class="secundario">Pronto: o Avalia aparece junto dos outros apps.</span>
+        </li>
+      </ol>
+    </section>
+
+    <section class="cartao" id="cartao-novidades" hidden>
+      <h2>Novidades desta versão</h2>
+      <div class="notas" id="novidades"></div>
+    </section>
+
+    <section class="cartao">
+      <h2>Deu problema?</h2>
+      <details>
+        <summary>Aparece “App não instalado”</summary>
+        <p>Normalmente é porque o Avalia que está no celular veio da Play Store. As duas versões não se misturam: desinstale a que está no aparelho e instale esta de novo.</p>
+      </details>
+      <details>
+        <summary>O botão não baixa nada</summary>
+        <p>Confira a internet e tente pelo Chrome. Se continuar, toque em “Ver todas as versões” e baixe o arquivo que termina em .apk.</p>
+      </details>
+    </section>
+
+    <footer>Avalia · Secretaria Municipal de Educação de Muriaé</footer>
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+  <script>
+    // Mesma consulta que o app faz pra se atualizar: a última release publicada.
+    const REPO = "secretaria-municipal-de-educacao-muriae/avalia-app-releases";
+    const API = "https://api.github.com/repos/" + REPO + "/releases/latest";
+    const PAGINA_RELEASES = "https://github.com/" + REPO + "/releases";
+
+    const $ = (id) => document.getElementById(id);
+
+    const ua = navigator.userAgent;
+    const ehIos = /iphone|ipad|ipod/i.test(ua) ||
+      (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    document.documentElement.dataset.plataforma =
+      /android/i.test(ua) ? "android" : ehIos ? "ios" : "computador";
+
+    $("link-todas").href = PAGINA_RELEASES;
+
+    const megabytes = (bytes) => Math.round(bytes / (1024 * 1024)) + " MB";
+    const data = (iso) => new Date(iso).toLocaleDateString("pt-BR");
+
+    // Notas da release em markdown simples: "- item" vira lista, "# título"
+    // vira destaque, o resto vira parágrafo. Tudo por textContent: o texto da
+    // release nunca entra como HTML.
+    const mostrarNotas = (texto) => {
+      const alvo = $("novidades");
+      const limpar = (s) => s.replace(/\*\*|`/g, "");
+      let lista = null;
+      for (const bruta of texto.split(/\r?\n/)) {
+        const linha = bruta.trim();
+        if (!linha) { lista = null; continue; }
+        const item = linha.match(/^[-*]\s+(.*)$/);
+        if (item) {
+          if (!lista) { lista = document.createElement("ul"); alvo.appendChild(lista); }
+          const li = document.createElement("li");
+          li.textContent = limpar(item[1]);
+          lista.appendChild(li);
+          continue;
+        }
+        lista = null;
+        const titulo = linha.match(/^#+\s+(.*)$/);
+        const el = document.createElement(titulo ? "strong" : "p");
+        el.textContent = limpar(titulo ? titulo[1] : linha);
+        alvo.appendChild(el);
+      }
+      $("cartao-novidades").hidden = alvo.childElementCount === 0;
+    };
+
+    // Sem release o botão fica desligado: a lista de versões estaria vazia.
+    // Com outra falha (rede, limite da API) ele leva pra lista, que funciona.
+    const falhar = (semVersao) => {
+      $("versao").textContent = semVersao
+        ? "Nenhuma versão publicada ainda"
+        : "Versão indisponível no momento";
+      $("erro").textContent = semVersao
+        ? "Ainda não há uma versão para baixar. Volte mais tarde."
+        : "Não deu para consultar a versão mais recente agora. O botão abre a lista de versões: baixe o arquivo que termina em .apk.";
+      $("erro").hidden = false;
+      if (semVersao) {
+        $("botao-texto").textContent = "Indisponível";
+        return;
+      }
+      $("botao").href = PAGINA_RELEASES;
+      $("botao").removeAttribute("aria-disabled");
+      $("botao-texto").textContent = "Abrir a lista de versões";
+    };
+
+    fetch(API, { headers: { Accept: "application/vnd.github+json" } })
+      .then((resposta) => {
+        if (resposta.status === 404) throw new Error("sem-release");
+        if (!resposta.ok) throw new Error("http-" + resposta.status);
+        return resposta.json();
+      })
+      .then((release) => {
+        const apk = (release.assets || []).find((a) => a.name.toLowerCase().endsWith(".apk"));
+        if (!apk) throw new Error("sem-apk");
+
+        const versao = release.tag_name.replace(/^v/i, "");
+        $("versao").textContent =
+          "Versão " + versao + " · " + megabytes(apk.size) + " · " + data(release.published_at);
+        $("botao").href = apk.browser_download_url;
+        $("botao").removeAttribute("aria-disabled");
+        if (release.body) mostrarNotas(release.body);
+      })
+      .catch((erro) => {
+        falhar(erro.message === "sem-release" || erro.message === "sem-apk");
+      });
+
+    // QR desta própria página, pra quem abriu no computador.
+    if (window.qrcode) {
+      const qr = qrcode(0, "M");
+      qr.addData(location.origin + location.pathname);
+      qr.make();
+      $("qr").innerHTML = qr.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+    }
+  </script>
+</body>
+</html>
